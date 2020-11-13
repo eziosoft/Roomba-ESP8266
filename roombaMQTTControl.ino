@@ -23,6 +23,9 @@ WiFiClient espClient;
 PubSubClient client(espClient); //MQTT
 
 
+int voltage =  0;
+
+
 void setup() {
   pinMode(D5, OUTPUT);
   Serial.begin(115200);
@@ -84,24 +87,10 @@ void setup() {
   setWarningLED(OFF);
   writeLEDs ('R', 'E', 'D', 'Y');
 
-  //motorSquareTest(); // un-comment if you want to test Roomba doing a square
-  //  turnCW (40, 180);  //un-comment if you want to test Roomba spin clock-wise 180 degrees and stop
-  // driveWheels(20, 10); //un-comment if you want to test Roomba spin
-  //  driveLeft(20); //un-comment if you want to test Roomba turning left
-
-
   Serial.print("READY");
 }
 
 void loop() {
-  //  if (Serial.available())
-  //  {
-  //    command = Serial.read();
-  //    Serial.flush();
-  //    manualCmd ();
-  //  }
-
-
   ArduinoOTA.handle();
 
   //MQTT
@@ -110,10 +99,7 @@ void loop() {
 
   //send telemetry every 200ms
   if (millis() % 1000 == 0) {
-    int voltage =  0;//getSensorData(22);
-    Serial.println(voltage);
-
-    sprintf(buffer1, "T;%d;RSSI=%d;%d", millis() / 1000, WiFi.RSSI(), voltage);
+    sprintf(buffer1, "T;%d;RSSI=%d;%dmV", millis() / 1000, WiFi.RSSI(), voltage);
     client.publish(outTopic, buffer1);
   }
 }
@@ -179,6 +165,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
           seekDock();
           break;
 
+        case 4:
+          //undock
+          startFull();
+          playSound (2);
+          driveWheels(-100, -100);
+          delay(1000);
+          driveWheels(-100, 100);
+          delay(3200);
+          driveWheels(0, 0);
+          startSafe();
+          break;
+
         case 10:
           enableBrushes(true, false, true, true, true);
           break;
@@ -191,7 +189,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
           writeLEDs ('-', 'G', 'O', '-');
           clean();
           break;
-
+        case 20:
+          voltage =  getSensorData(22);
+          break;
 
 
       }
