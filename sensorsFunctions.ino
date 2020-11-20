@@ -51,15 +51,15 @@ int getSensorData(byte sensorID)
   }
   byte MSB = 0;
   byte LSB = 0;
-  Roomba.write(142);
-  Roomba.write(packetID);
+  Serial.write(142);
+  Serial.write(packetID);
     if(is_in_array(packetID)){
-      while (!Roomba.available());
-      returnVal = Roomba.read();
+      while (!Serial.available());
+      returnVal = Serial.read();
     } else {
-      while (!Roomba.available());
-      MSB = Roomba.read();
-      LSB = Roomba.read();
+      while (!Serial.available());
+      MSB = Serial.read();
+      LSB = Serial.read();
       returnVal = (MSB << 8) | LSB;
     }
     

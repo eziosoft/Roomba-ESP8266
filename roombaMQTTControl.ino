@@ -7,41 +7,36 @@
 #include <ArduinoOTA.h>
 #include <SoftwareSerial.h>
 
-
-const char* ssid = "Robot"; //robot creates wifi hotspot when wifi connection is not configured
-const char* outTopic = "tank/out"; //MQTT topic for robot telemetry messages
-const char* inTopic = "tank/in"; //MQTT topic for control messages
-const char* mqtt_server = "192.168.0.19"; //my defauld MQTT server
-const char* mqtt_server1 = "test.mosquitto.org";
-
-
-SoftwareSerial Roomba(D7, D6); //rx, tx
-
+const char *ssid = "Robot";               //robot creates wifi hotspot when wifi connection is not configured
+const char *outTopic = "tank/out";        //MQTT topic for robot telemetry messages
+const char *inTopic = "tank/in";          //MQTT topic for control messages
+const char *mqtt_server = "192.168.0.19"; //my defauld MQTT server
+const char *mqtt_server1 = "test.mosquitto.org";
+const char *streamTopic = "tank/stream";
+const char *debug = "tank/debug";
 
 char buffer1[20]; //multiusage
 WiFiClient espClient;
 PubSubClient client(espClient); //MQTT
 
-
-int voltage =  0;
-
-
-void setup() {
+void setup()
+{
   pinMode(D5, OUTPUT);
+
   Serial.begin(115200);
-  Roomba.begin(115200);
+
 
   wakeUp();
   startSafe();
-  playSound (2);
+  playSound(2);
   stop();
   delay(2000);
 
   startSafe();
-  playSound (2);
+  playSound(2);
 
   setDebrisLED(ON);
-  writeLEDs ('W', 'I', 'F', 'Y');
+  writeLEDs('W', 'I', 'F', 'Y');
 
   WiFiManager wifiManager;
   wifiManager.autoConnect("Robot");
@@ -67,58 +62,68 @@ void setup() {
   });
   ArduinoOTA.onError([](ota_error_t error) {
     Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    if (error == OTA_AUTH_ERROR)
+      Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR)
+      Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR)
+      Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR)
+      Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR)
+      Serial.println("End Failed");
   });
   ArduinoOTA.begin();
   //OTA END
 
-
   ////////////////////
 
-  playSound (3);
+  playSound(3);
   setPowerLED(255, 255);
   setDebrisLED(ON);
   setDockLED(OFF);
   setSpotLED(OFF);
   setWarningLED(OFF);
-  writeLEDs ('R', 'E', 'D', 'Y');
-
-  Serial.print("READY");
+  writeLEDs('R', 'E', 'D', 'Y');
 }
 
-void loop() {
+void loop()
+{
   ArduinoOTA.handle();
 
   //MQTT
-  if (!client.connected()) reconnect();
-  else client.loop();
+  if (!client.connected())
+    reconnect();
+  else
+    client.loop();
 
   //send telemetry every 200ms
-  if (millis() % 1000 == 0) {
-    sprintf(buffer1, "T;%d;RSSI=%d;%dmV", millis() / 1000, WiFi.RSSI(), voltage);
+  if (millis() % 1000 == 0)
+  {
+    int voltage = 0; //getSensorData(22);
+    sprintf(buffer1, "T;%d;RSSI=%d;%d", millis() / 1000, WiFi.RSSI(), voltage);
     client.publish(outTopic, buffer1);
+  }
+
+  int b = Serial.available();
+  if (b > 170)
+  {
+    char buffer[b];
+    Serial.readBytes(buffer, b);
+    client.publish(streamTopic, buffer);
   }
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
-
+void callback(char *topic, byte *payload, unsigned int length)
+{
   //control is done by 6 byte messages : [$][len][ch1][ch2][ch3][ch4]
   // [$] - start of the frame
   // [len] - number of bytes to read. in this case always 4
   // [ch1][ch2][ch3][ch4] - control channels. Each channel has a range from 0 to 200. Middle is at 100 - servo stop
-  if (length > 0) {
-    if ((char)payload[0] == '$') {
+  if (length > 0)
+  {
+    if ((char)payload[0] == '$')
+    {
 
       int len = payload[1];
       int ch1 = payload[2] - 100;
@@ -126,14 +131,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
       int ch3 = payload[4] - 100;
       int ch4 = payload[5] - 100;
 
-
       //chanel mixer
       int m1 = ch2 - ch1;
       int m2 = ch2 + ch1;
-      if (m1 > 100)m1 = 100;
-      if (m1 < -100) m1 = -100;
-      if (m2 > 100)m2 = 100;
-      if (m2 < -100) m2 = -100;
+      if (m1 > 100)
+        m1 = 100;
+      if (m1 < -100)
+        m1 = -100;
+      if (m2 > 100)
+        m2 = 100;
+      if (m2 < -100)
+        m2 = -100;
 
       m1 = map(m1, -100, 100, -500, 500);
       m2 = map(m2, -100, 100, -500, 500);
@@ -152,13 +160,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
         case 2:
           wakeUp();
           startFull();
-          playSound (2);
+          playSound(2);
           setPowerLED(255, 255);
           setDebrisLED(ON);
           setDockLED(OFF);
           setSpotLED(OFF);
           setWarningLED(OFF);
-          writeLEDs ('R', 'E', 'D', 'Y');
+          writeLEDs('R', 'E', 'D', 'Y');
           break;
 
         case 3:
@@ -168,13 +176,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
         case 4:
           //undock
           startFull();
-          playSound (2);
+          playSound(2);
           driveWheels(-100, -100);
           delay(1000);
           driveWheels(-100, 100);
           delay(3200);
           driveWheels(0, 0);
           startSafe();
+          break;
+
+        case 5:
+          powerOff();
           break;
 
         case 10:
@@ -186,44 +198,42 @@ void callback(char* topic, byte* payload, unsigned int length) {
           break;
 
         case 12:
-          writeLEDs ('-', 'G', 'O', '-');
+          writeLEDs('-', 'G', 'O', '-');
           clean();
           break;
         case 20:
-          voltage =  getSensorData(22);
+          //start stream
+          Serial.write(148);
+          Serial.write(2); //get one sensor
+          Serial.write(22); //get voltage sensor
+          Serial.write(23);
           break;
 
-
+        case 21:
+          //pause stream
+          Serial.write(150);//set stream state
+          Serial.write(0); //pause stream
+          break;
       }
-
-      //debug
-      Serial.print(ch1);
-      Serial.print(" ");
-      Serial.print(ch2);
-      Serial.print("->");
-      Serial.print(ch3);
-      Serial.print(" ");
-      Serial.println(ch4);
     }
   }
 }
 
-void reconnect() {
+void reconnect()
+{
   // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+  while (!client.connected())
+  {
     // Attempt to connect
-    if (client.connect(ssid)) {
-      Serial.println("connected");
-      playSound (1);
-      // Once connected, publish an announcement...
-      client.publish(outTopic, "Tank READY");
-      // ... and resubscribe
+    if (client.connect(ssid))
+    {
+      playSound(1);
+      client.publish(outTopic, "READY");
       client.subscribe(inTopic);
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+    }
+    else
+    {
+      // Serial.print(client.state());
       // Wait 5 seconds before retrying
       delay(5000);
     }

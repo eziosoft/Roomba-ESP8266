@@ -3,11 +3,11 @@ void drive(int velocity, int radius)
   clamp(velocity, -500, 500); //def max and min velocity in mm/s
   clamp(radius, -2000, 2000); //def max and min radius in mm
   
-  Roomba.write(137);
-  Roomba.write(velocity >> 8);
-  Roomba.write(velocity);
-  Roomba.write(radius >> 8);
-  Roomba.write(radius);
+  Serial.write(137);
+  Serial.write(velocity >> 8);
+  Serial.write(velocity);
+  Serial.write(radius >> 8);
+  Serial.write(radius);
 }
 
 //---------------------------------------------------------------
@@ -17,11 +17,11 @@ void driveWheels(int right, int left)
   clamp(right, -500, 500);
   clamp(left, -500, 500);
   
-  Roomba.write(145);
-  Roomba.write(right >> 8);
-  Roomba.write(right);
-  Roomba.write(left >> 8);
-  Roomba.write(left);
+  Serial.write(145);
+  Serial.write(right >> 8);
+  Serial.write(right);
+  Serial.write(left >> 8);
+  Serial.write(left);
   }
 
 //---------------------------------------------------------------
@@ -30,11 +30,11 @@ void driveWheelsPWM(int rightPWM, int leftPWM)
   clamp(rightPWM, -255, 255);
   clamp(leftPWM, -255, 255);
   
-  Roomba.write(146);
-  Roomba.write(rightPWM >> 8);
-  Roomba.write(rightPWM);
-  Roomba.write(leftPWM >> 8);
-  Roomba.write(leftPWM);
+  Serial.write(146);
+  Serial.write(rightPWM >> 8);
+  Serial.write(rightPWM);
+  Serial.write(leftPWM >> 8);
+  Serial.write(leftPWM);
 }
 
 //---------------------------------------------------------------

@@ -7,61 +7,61 @@ void setPowerLED(byte setColor, byte setIntensity)
 {
   color = setColor;
   intensity = setIntensity;
-  Roomba.write(139);
-  Roomba.write((byte)0x00);
-  Roomba.write((byte)color);
-  Roomba.write((byte)intensity);
+  Serial.write(139);
+  Serial.write((byte)0x00);
+  Serial.write((byte)color);
+  Serial.write((byte)intensity);
 }
 
 //---------------------------------------------------------------
 void setDebrisLED(bool enable)
 {
   debrisLED = enable;
-  Roomba.write(139);
-  Roomba.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
-  Roomba.write((byte)color);
-  Roomba.write((byte)intensity);
+  Serial.write(139);
+  Serial.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
+  Serial.write((byte)color);
+  Serial.write((byte)intensity);
 }
 
 //---------------------------------------------------------------
 void setSpotLED(bool enable)
 {
   spotLED = enable;
-  Roomba.write(139);
-  Roomba.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
-  Roomba.write((byte)color);
-  Roomba.write((byte)intensity);
+  Serial.write(139);
+  Serial.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
+  Serial.write((byte)color);
+  Serial.write((byte)intensity);
 }
 
 //---------------------------------------------------------------
 void setDockLED(bool enable)
 {
   dockLED = enable;
-  Roomba.write(139);
-  Roomba.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
-  Roomba.write((byte)color);
-  Roomba.write((byte)intensity);
+  Serial.write(139);
+  Serial.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
+  Serial.write((byte)color);
+  Serial.write((byte)intensity);
 }
 
 //---------------------------------------------------------------
 void setWarningLED(bool enable)
 {
   warningLED = enable;
-  Roomba.write(139);
-  Roomba.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
-  Roomba.write((byte)color);
-  Roomba.write((byte)intensity);
+  Serial.write(139);
+  Serial.write((debrisLED ? 1 : 0) + (spotLED ? 2 : 0) + (dockLED ? 4 : 0) + (warningLED ? 8 : 0));
+  Serial.write((byte)color);
+  Serial.write((byte)intensity);
 }
 
 /*--------------------------------------------------------------------------
 This command controls the four 7 segment displays on the Roomba.*/
 void setDigitLEDs(byte digit1, byte digit2, byte digit3, byte digit4)
 {
-    Roomba.write(163);
-    Roomba.write(digit1);
-    Roomba.write(digit2);
-    Roomba.write(digit3);
-    Roomba.write(digit4);
+    Serial.write(163);
+    Serial.write(digit1);
+    Serial.write(digit2);
+    Serial.write(digit3);
+    Serial.write(digit4);
 }
 
 /*--------------------------------------------------------------------------
@@ -82,11 +82,11 @@ void setDigitLEDFromASCII(byte digit, char letter)
     digit4 = letter;
     break;
   }
-  Roomba.write(164);
-  Roomba.write(digit1);
-  Roomba.write(digit2);
-  Roomba.write(digit3);
-  Roomba.write(digit4);
+  Serial.write(164);
+  Serial.write(digit1);
+  Serial.write(digit2);
+  Serial.write(digit3);
+  Serial.write(digit4);
 }
 
 //---------------------------------------------------------------
