@@ -33,7 +33,7 @@ void setup()
   delay(2000);
 
   startSafe();
-  playSound(2);
+  // playSound(2);
 
   setDebrisLED(ON);
   writeLEDs('W', 'I', 'F', 'Y');
@@ -78,7 +78,7 @@ void setup()
 
   ////////////////////
 
-  playSound(3);
+  // playSound(3);
   setPowerLED(255, 255);
   setDebrisLED(ON);
   setDockLED(OFF);
@@ -108,9 +108,9 @@ void loop()
   int b = Serial.available();
   if (b > 170)
   {
-    char buffer[b];
+    byte buffer[b];
     Serial.readBytes(buffer, b);
-    client.publish(streamTopic, buffer);
+    client.publish(streamTopic, buffer, b);
   }
 }
 
@@ -160,7 +160,7 @@ void callback(char *topic, byte *payload, unsigned int length)
         case 2:
           wakeUp();
           startFull();
-          playSound(2);
+          // playSound(2);
           setPowerLED(255, 255);
           setDebrisLED(ON);
           setDockLED(OFF);
@@ -204,9 +204,27 @@ void callback(char *topic, byte *payload, unsigned int length)
         case 20:
           //start stream
           Serial.write(148);
-          Serial.write(2); //get one sensor
-          Serial.write(22); //get voltage sensor
-          Serial.write(23);
+          Serial.write(18); //get one sensor
+
+          Serial.write(7); //BUMPS wheeldops 1
+          Serial.write(8); //wall 1
+          Serial.write(21);//charging state 1
+          Serial.write(22); //voltage  2
+          Serial.write(23); //current  2
+          Serial.write(24); //temperature 1
+          Serial.write(25); //battery charge 2
+          Serial.write(26); //battery capacity 2
+          Serial.write(28);//cliff left
+          Serial.write(29);//cliff front left
+          Serial.write(30);//cliff fromt right
+          Serial.write(31);//cliff right signal
+          Serial.write(46);//light bump left
+          Serial.write(47);//frontleft
+          Serial.write(48);//center left
+          Serial.write(49);//center right
+          Serial.write(50);//front right
+          Serial.write(51);//right
+          //          Serial.write(3);
           break;
 
         case 21:
@@ -227,7 +245,7 @@ void reconnect()
     // Attempt to connect
     if (client.connect(ssid))
     {
-      playSound(1);
+      // playSound(1);
       client.publish(outTopic, "READY");
       client.subscribe(inTopic);
     }
