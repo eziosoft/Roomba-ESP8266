@@ -6,6 +6,9 @@
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
 #include <SoftwareSerial.h>
+//
+//int sensors[] = {22};//{7, 8, 21, 22, 23, 24, 25, 26, 35, 46, 47, 48, 49, 50, 51};
+//int sensorCount = sizeof(sensors);
 
 const char *ssid = "Robot";               //robot creates wifi hotspot when wifi connection is not configured
 const char *outTopic = "tank/out";        //MQTT topic for robot telemetry messages
@@ -22,12 +25,10 @@ PubSubClient client(espClient); //MQTT
 void setup()
 {
   pinMode(D5, OUTPUT);
-
   Serial.begin(115200);
 
-
   wakeUp();
-  startSafe();
+  startFull();
   playSound(2);
   stop();
   delay(2000);
@@ -101,7 +102,7 @@ void loop()
   if (millis() % 1000 == 0)
   {
     int voltage = 0; //getSensorData(22);
-    sprintf(buffer1, "T;%d;RSSI=%d;%d", millis() / 1000, WiFi.RSSI(), voltage);
+    sprintf(buffer1, "T;%d;RSSI=%d;", millis() / 1000, WiFi.RSSI());
     client.publish(outTopic, buffer1);
   }
 
@@ -224,8 +225,8 @@ void callback(char *topic, byte *payload, unsigned int length)
           Serial.write(49);//center right
           Serial.write(50);//front right
           Serial.write(51);//right
-          //          Serial.write(3);
           break;
+
 
         case 21:
           //pause stream
