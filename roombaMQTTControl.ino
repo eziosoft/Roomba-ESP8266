@@ -37,7 +37,7 @@ void setup()
   // playSound(2);
 
   setDebrisLED(ON);
-  writeLEDs('W', 'I', 'F', 'Y');
+  writeLEDs('W', 'I', 'F', 'I');
 
   WiFiManager wifiManager;
   wifiManager.autoConnect("Robot");
@@ -176,14 +176,8 @@ void callback(char *topic, byte *payload, unsigned int length)
 
         case 4:
           //undock
-          startFull();
-          playSound(2);
-          driveWheels(-100, -100);
-          delay(1000);
-          driveWheels(-100, 100);
-          delay(3200);
-          driveWheels(0, 0);
-          startSafe();
+          wakeUp();
+          clean();
           break;
 
         case 5:
