@@ -6,9 +6,7 @@
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
 #include <SoftwareSerial.h>
-//
-//int sensors[] = {22};//{7, 8, 21, 22, 23, 24, 25, 26, 35, 46, 47, 48, 49, 50, 51};
-//int sensorCount = sizeof(sensors);
+
 
 const char *ssid = "Robot";               //robot creates wifi hotspot when wifi connection is not configured
 const char *outTopic = "tank/out";        //MQTT topic for robot telemetry messages
@@ -213,23 +211,14 @@ void callback(char *topic, byte *payload, unsigned int length)
           Serial.write(18); //get one sensor
 
           Serial.write(7); //BUMPS wheeldops 1
-          Serial.write(8); //wall 1
+          Serial.write(19);//Distance
+          Serial.write(20);//Angle
           Serial.write(21);//charging state 1
           Serial.write(22); //voltage  2
-          Serial.write(23); //current  2
-          Serial.write(24); //temperature 1
           Serial.write(25); //battery charge 2
           Serial.write(26); //battery capacity 2
-          Serial.write(28);//cliff left
-          Serial.write(29);//cliff front left
-          Serial.write(30);//cliff fromt right
-          Serial.write(31);//cliff right signal
-          Serial.write(46);//light bump left
-          Serial.write(47);//frontleft
-          Serial.write(48);//center left
-          Serial.write(49);//center right
-          Serial.write(50);//front right
-          Serial.write(51);//right
+          Serial.write(39);//velocity
+          Serial.write(45);//light bumper
           break;
 
 
