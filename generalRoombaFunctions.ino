@@ -2,13 +2,13 @@
 // wake up the robot
 void wakeUp (void)
 {
-  setWarningLED(ON);
-  digitalWrite(ddPin, HIGH);
-  delay(100);
+  pinMode(ddPin, OUTPUT);
   digitalWrite(ddPin, LOW);
-  delay(500);
+  delay(200);
+
   digitalWrite(ddPin, HIGH);
-  delay(2000);
+  delay(200);
+  pinMode(ddPin, INPUT);
 }
 
 /*--------------------------------------------------------------------------

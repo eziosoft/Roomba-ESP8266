@@ -22,9 +22,11 @@ char buffer1[20]; //multiusage
 WiFiClient espClient;
 PubSubClient client(espClient); //MQTT
 
+long timer1;
+
 void setup()
 {
-  pinMode(D5, OUTPUT);
+  pinMode(ddPin, OUTPUT);
   Serial.begin(115200);
 
   wakeUp();
@@ -106,6 +108,14 @@ void loop()
     client.publish(outTopic, buffer1);
   }
 
+  
+  if (timer1 < millis()) // pulse wake up pin to prevent sleeping every 30sec
+  {
+    timer1=10000+millis();
+    client.publish(outTopic, "Wakeup");
+    wakeUp();
+  }
+
   int b = Serial.available();
   if (b > 170)
   {
@@ -176,6 +186,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 
         case 4:
           //undock
+          clean();
           wakeUp();
           clean();
           break;
