@@ -207,8 +207,8 @@ void callback(char *topic, byte *payload, unsigned int length)
           break;
         case 20:
           //start stream
-          Serial.write(148);
-          Serial.write(18); //get one sensor
+          Serial.write(148); //Stream
+          Serial.write(9); //Number of packets
 
           Serial.write(7); //BUMPS wheeldops 1
           Serial.write(19);//Distance
